@@ -1,0 +1,32 @@
+buildscript {
+	repositories {
+		maven {
+			url "https://repository-cdn.liferay.com/nexus/content/groups/public"
+		}
+	}
+
+	dependencies {
+		classpath group: "com.liferay", name: "com.liferay.css.builder", version: "latest.release"
+		classpath group: "com.liferay", name: "com.liferay.gradle.plugins.css.builder", version: "latest.release"
+	}
+}
+
+apply plugin: "com.liferay.css.builder"
+apply plugin: 'war'
+
+dependencies {
+	compileOnly group: "com.liferay.portal", name: "release.portal.api"
+	compileOnly project(":apps:service-builder:basic:basic-api")
+}
+
+war {
+	dependsOn buildCSS
+
+	exclude('**/*.scss')
+
+	filesMatching("**/.sass-cache/") {
+		it.path = it.path.replace(".sass-cache/", "")
+	}
+
+	includeEmptyDirs = false
+}

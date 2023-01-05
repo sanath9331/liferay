@@ -1,0 +1,10 @@
+dependencies {
+	compileOnly group: "com.liferay.portal", name: "release.portal.api"
+	compileOnly project(":apps:service-builder:dsp:dsp-api")
+}
+
+buildService {
+	apiDir = "../dsp-api/src/main/java"
+}
+
+group = "com.liferay.blade.samples.dspservicebuilder"

@@ -1,0 +1,83 @@
+apply plugin: 'groovy'
+
+dependencies {
+	testCompile gradleApi()
+	testCompile gradleTestKit()
+	testCompile group: "biz.aQute.bnd", name: "biz.aQute.bnd", version: "3.3.0"
+	testCompile group: "com.squareup.okhttp3", name: "okhttp", version: "3.3.1"
+	testCompile group: "org.codehaus.groovy", name: "groovy-all", version: "2.4.4"
+	testCompile group: "org.spockframework", name: "spock-core", version: "1.0-groovy-2.4"
+
+	testCompile project(":tests:utils")
+}
+
+repositories {
+	maven {
+		url "https://repository-cdn.liferay.com/nexus/content/groups/public"
+	}
+}
+
+startTestableTomcat {
+	checkTimeout = 30 * 60 * 1000
+}
+
+stopTestableTomcat {
+	doLast {
+		delete new File(liferay.liferayHome, "data")
+	}
+}
+
+testIntegration {
+
+	rootProject.subprojects { p ->
+		p.plugins.withType(JavaPlugin) {
+			dependsOn p.tasks["jar"]
+		}
+
+		p.plugins.withType(WarPlugin) {
+			dependsOn p.tasks["war"]
+		}
+
+	}
+
+	outputs.upToDateWhen { false }
+
+	def moduleOutputPaths = []
+
+	rootProject.subprojects { p ->
+		def tempOutput
+
+		p.plugins.withType(WarPlugin) {
+			tempOutput = p.tasks["war"].outputs.files.singleFile.absolutePath
+		}
+
+		if (tempOutput == null) {
+			p.plugins.withType(JavaPlugin) {
+				tempOutput = p.tasks["jar"].outputs.files.singleFile.absolutePath
+			}
+		}
+
+		if (tempOutput != null) {
+
+			moduleOutputPaths << tempOutput
+
+		}
+
+
+	}
+
+	moduleOutputPaths.removeAll { it.contains("test") }
+
+	systemProperty 'bladeURL', System.getProperty('bladeURL', "https://repository.liferay.com/nexus/content/groups/public//com/liferay/blade/com.liferay.blade.cli/3.9.0/com.liferay.blade.cli-3.9.0.jar")
+	systemProperty 'moduleOutputPaths', moduleOutputPaths.unique().join(",")
+	systemProperty 'portalVersion', project.getProperty("liferay.workspace.product")
+
+	finalizedBy {
+		stopTestableTomcat
+	}
+
+	doLast {
+		delete new File("blade.jar")
+		delete new File("target")
+	}
+}

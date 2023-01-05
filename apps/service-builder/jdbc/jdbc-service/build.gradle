@@ -1,0 +1,10 @@
+dependencies {
+	compileOnly group: "com.liferay.portal", name: "release.portal.api"
+	compileOnly project(":apps:service-builder:jdbc:jdbc-api")
+}
+
+buildService {
+	apiDir = "../jdbc-api/src/main/java"
+}
+
+group = "com.liferay.blade.samples.jdbcservicebuilder"
