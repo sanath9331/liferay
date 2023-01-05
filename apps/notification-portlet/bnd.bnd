@@ -1,4 +1,0 @@
-Bundle-Name: notification-portlet
-Bundle-SymbolicName: com.liferay.blade.sample.notifications
-Bundle-Version: 1.0.0
-Export-Package: com.liferay.blade.sample.notifications.constants

@@ -1,4 +1,0 @@
-dependencies {
-	compileOnly group: "com.liferay.portal", name: "release.portal.api"
-	compileOnly project(":apps:greedy-policy-option-portlet:service-reference")
-}
